@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/Solution Folder/">
+    <File Path="..\.github\workflows\SRC.DiscordBot.yaml" />
+  </Folder>
+  <Project Path="SRC.DiscordBot\SRC.DiscordBot.csproj" />
+</Solution>

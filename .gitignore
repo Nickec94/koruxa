@@ -1,0 +1,11 @@
+
+bin/
+obj/
+
+.idea/
+*.sln.DotSettings.*
+
+.nuget/
+.utmp/
+.tmp/
+.vs/
