@@ -1,16 +1,21 @@
 using SRC.DiscordBot;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
 using NetCord.Hosting.Gateway;
 using NetCord.Hosting.Services.ApplicationCommands;
 using Nixon.Extensions.Hosting.Jobs;
 using Nixon.Extensions.Serilog.AspNetCore;
 
-var builder = WebApplication.CreateSlimBuilder(args)
+var builder = Host.CreateApplicationBuilder(args)
     .AddSerilogConfiguration();
+
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddUserSecrets<Program>();
+}
 
 builder.Services.AddDiscordGateway(options =>
 {
