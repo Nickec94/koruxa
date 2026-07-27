@@ -1,4 +1,4 @@
-name: KoruxaBot
+name: SRC.DiscordBot
 
 on:
   workflow_dispatch:

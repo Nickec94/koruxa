@@ -7,8 +7,10 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using NetCord.Hosting.Gateway;
 using NetCord.Hosting.Services.ApplicationCommands;
 using Nixon.Extensions.Hosting.Jobs;
+using Nixon.Extensions.Serilog.AspNetCore;
 
-var builder = WebApplication.CreateSlimBuilder(args);
+var builder = WebApplication.CreateSlimBuilder(args)
+    .AddSerilogConfiguration();
 
 builder.Services.AddDiscordGateway(options =>
 {
