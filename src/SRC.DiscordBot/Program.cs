@@ -24,7 +24,7 @@ builder.Services.AddDbContextFactory<AppDbContext>(options =>
     options.UseSnakeCaseNamingConvention();
 });
 
-builder.Services.AddCronJob<BossAttackNotifier>("* * * * * *");
+builder.Services.AddCronJob<BossAttackNotifier>("0 */10 * * * ?");
 
 builder.Services.TryAddScoped<KoruxaBossService>();
 
