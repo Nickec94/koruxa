@@ -4,11 +4,9 @@ using NetCord.Rest;
 
 namespace SRC.DiscordBot;
 
-public static class NetcordExtensions
+public static class NetCordExtensions
 {
-    public static async Task ResponseWithMessageAsync(
-        this ApplicationCommandInteraction interaction,
-        string content)
+    public static async Task ResponseWithMessageAsync(this ApplicationCommandInteraction interaction, string content)
     {
         await interaction.SendResponseAsync(
             InteractionCallback.Message(
