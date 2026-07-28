@@ -2,8 +2,6 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
-using NetCord;
-using NetCord.Rest;
 using NetCord.Services.ApplicationCommands;
 
 namespace SRC.DiscordBot;
@@ -41,18 +39,15 @@ internal sealed class SlashCommandModule(KoruxaBossService bossService) : Applic
             .AddMinutes(minutes)
             .AddSeconds(seconds);
 
-        long unixTime = endTime.ToUnixTimeSeconds();
-
-        await Context.Interaction.ResponseWithMessageAsync($"Boss event started! Ends **<t:{unixTime}:R>**");
+        await Context.Interaction.ResponseWithMessageAsync(
+            $"Boss event started! Ends {DiscordUtil.Bold(DiscordUtil.RelativeTime(endTime))}"
+        );
     }
 
     [SlashCommand("say", "Send a message as the bot")]
     public async Task SayAsync(string message)
     {
-        await Context.Channel.SendMessageAsync(new MessageProperties
-        {
-            Content = message
-        });
+        await Context.Channel.SendMessageAsync(message);
 
         await Context.Interaction.ResponseWithMessageAsync("Message sent!");
     }
