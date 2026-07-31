@@ -29,7 +29,7 @@ internal class SlashCommandModule(KoruxaBossService bossService) : ApplicationCo
     {
         await bossService.AttackAsync(Context.User.Id, CancellationToken.None);
         
-        await Context.Interaction.SendResponseAsync(InteractionCallback.Message("Time to slap your bosses ass"));
+        await Context.Interaction.ResponseWithMessageAsync("Time to slap your bosses ass");
     }
 
     [SlashCommand("killed", "Register the boss death")]
@@ -37,7 +37,7 @@ internal class SlashCommandModule(KoruxaBossService bossService) : ApplicationCo
     {
         await bossService.KillBossAsync(CancellationToken.None);
 
-        await Context.Interaction.SendResponseAsync(InteractionCallback.Message("Got it, boss is dead"));
+        await Context.Interaction.ResponseWithMessageAsync("Got it, boss is dead");
     }
 
     [SlashCommand("timer", "Start a boss timer")]
@@ -45,7 +45,7 @@ internal class SlashCommandModule(KoruxaBossService bossService) : ApplicationCo
     {
         if (hours == 0 && minutes == 0 && seconds == 0)
         {
-            await Context.Interaction.SendResponseAsync(InteractionCallback.Message("Please specify a duration!"));
+            await Context.Interaction.ResponseWithMessageAsync("Please specify a duration!");
             return;
         }
 
@@ -76,7 +76,7 @@ internal class SlashCommandModule(KoruxaBossService bossService) : ApplicationCo
             Content = message
         });
 
-        await Context.Interaction.SendResponseAsync(InteractionCallback.Message("Message sent!"));
+        await Context.Interaction.ResponseWithMessageAsync("Message sent!";
     }
 
     private static async Task RunBossTimerLoopAsync(ApplicationCommandContext context, DateTimeOffset targetEndTime)
