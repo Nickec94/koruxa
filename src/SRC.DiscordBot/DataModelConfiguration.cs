@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Nixon.Extensions.EntityFrameworkCore;
+using SRC.DiscordBot.DataModels;
 
 namespace SRC.DiscordBot;
 
@@ -16,7 +17,7 @@ internal sealed class DataModelConfiguration :
         builder.HasKey(x => x.Id);
         
         builder.Property(x => x.Id).ValueGeneratedOnAdd();
-
+        
         builder.DefineOneToMany(x => x.Attacks, x => x.BossId);
     }
 

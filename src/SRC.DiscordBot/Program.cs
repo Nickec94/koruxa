@@ -6,8 +6,10 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using NetCord.Hosting.Gateway;
 using NetCord.Hosting.Services.ApplicationCommands;
+using NetCord.Hosting.Services.ComponentInteractions;
 using Nixon.Extensions.Hosting.Jobs;
 using Nixon.Extensions.Serilog.AspNetCore;
+using SRC.DiscordBot.Modules;
 
 var builder = Host.CreateApplicationBuilder(args)
     .AddSerilogConfiguration();
@@ -30,14 +32,17 @@ builder.Services.AddDbContextFactory<AppDbContext>(options =>
 });
 
 builder.Services.AddCronJob<BossAttackNotifier>("0 */10 * * * ?");
+builder.Services.AddCronJob<BossSpawnNotifier>("0 * * * * ?");
 
 builder.Services.TryAddScoped<KoruxaBossService>();
 
 builder.Services.AddApplicationCommands();
-    
-var host = builder.Build(); 
+builder.Services.AddComponentInteractions();
 
-host.AddApplicationCommandModule<SlashCommandModule>();
+var host = builder.Build();
+
+host.AddApplicationCommandModule<BossTimerSlashCommandModule>();
+host.AddComponentInteractionModule<BossTimerComponentModule>();
 
 using (var scope = host.Services.CreateScope())
 {

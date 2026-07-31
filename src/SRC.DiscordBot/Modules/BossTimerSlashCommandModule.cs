@@ -3,18 +3,19 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using NetCord.Services.ApplicationCommands;
+using SRC.DiscordBot.Components;
 
-namespace SRC.DiscordBot;
+namespace SRC.DiscordBot.Modules;
 
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)]
-internal sealed class SlashCommandModule(KoruxaBossService bossService) : ApplicationCommandModule<ApplicationCommandContext>
+internal class BossTimerSlashCommandModule(KoruxaBossService bossService) : ApplicationCommandModule<ApplicationCommandContext>
 {
     [SlashCommand("attack", "Register your boss attack")]
     public async Task AttackAsync()
     {
         await bossService.AttackAsync(Context.User.Id, CancellationToken.None);
         
-        await Context.Interaction.ResponseWithMessageAsync("Time to slap your bosses ass");
+        await Context.Interaction.RespondWithMessageAsync("Time to slap your bosses ass");
     }
 
     [SlashCommand("killed", "Register the boss death")]
@@ -22,7 +23,7 @@ internal sealed class SlashCommandModule(KoruxaBossService bossService) : Applic
     {
         await bossService.KillBossAsync(CancellationToken.None);
 
-        await Context.Interaction.ResponseWithMessageAsync("Got it, boss is dead");
+        await Context.Interaction.RespondWithMessageAsync("Got it, boss is dead");
     }
 
     [SlashCommand("timer", "Start a boss timer")]
@@ -30,17 +31,20 @@ internal sealed class SlashCommandModule(KoruxaBossService bossService) : Applic
     {
         if (hours == 0 && minutes == 0 && seconds == 0)
         {
-            await Context.Interaction.ResponseWithMessageAsync("Please specify a duration!");
+            await Context.Interaction.RespondWithMessageAsync("Please specify a duration!");
             return;
         }
 
-        var endTime = DateTimeOffset.UtcNow
+        var spawnAt = DateTimeOffset.UtcNow
             .AddHours(hours)
             .AddMinutes(minutes)
             .AddSeconds(seconds);
 
-        await Context.Interaction.ResponseWithMessageAsync(
-            $"Boss event started! Ends {DiscordUtil.Bold(DiscordUtil.RelativeTime(endTime))}"
+        await bossService.ScheduleBossAsync(spawnAt, CancellationToken.None);
+
+        await Context.Interaction.RespondWithMessageAsync(
+            $"Boss spawn scheduled for {DiscordUtil.Countdown(spawnAt)}",
+            components: [BossTimerActionRow.CreateNew()]
         );
     }
 
@@ -49,6 +53,6 @@ internal sealed class SlashCommandModule(KoruxaBossService bossService) : Applic
     {
         await Context.Channel.SendMessageAsync(message);
 
-        await Context.Interaction.ResponseWithMessageAsync("Message sent!");
+        await Context.Interaction.RespondWithMessageAsync("Message sent!");
     }
 }
