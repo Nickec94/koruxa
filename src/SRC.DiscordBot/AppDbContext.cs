@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using SRC.DiscordBot.DataModels;
 
 namespace SRC.DiscordBot;
 
