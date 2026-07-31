@@ -1,7 +1,9 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using SRC.DiscordBot.DataModels;
 
 namespace SRC.DiscordBot;
 
@@ -11,7 +13,8 @@ internal sealed class KoruxaBossService(AppDbContext dbContext)
     {
         _ = await GetOrAddUserAsync(discordUserId, cancellationToken);
         
-        var boss = await GetOrAddBossAsync(cancellationToken);
+        var boss = await GetCurrentBossAsync(cancellationToken)
+            ?? throw new InvalidOperationException("No boss found, it needs to be marked as killed");
         
         var attack = KoruxaBossAttack.CreateNew(discordUserId);
 
@@ -19,11 +22,31 @@ internal sealed class KoruxaBossService(AppDbContext dbContext)
         
         await dbContext.SaveChangesAsync(cancellationToken);
     }
+
+    public async Task ScheduleBossAsync(DateTimeOffset scheduledAt, CancellationToken cancellationToken)
+    {
+        var pendingScheduledBosses = dbContext.Boss
+            .AsEnumerable()
+            .Where(x => x.CreatedAt > DateTimeOffset.UtcNow)
+            .ToList();
+
+        if (pendingScheduledBosses.Count > 0)
+        {
+            dbContext.Boss.RemoveRange(pendingScheduledBosses);
+        }
+
+        var boss = KoruxaBoss.CreateNew(scheduledAt);
+        
+        dbContext.Boss.Add(boss);
+
+        await dbContext.SaveChangesAsync(cancellationToken);
+    }
     
     public async Task KillBossAsync(CancellationToken cancellationToken)
     {
-        var boss = await dbContext.Boss
-            .SingleOrDefaultAsync(x => !x.KilledAt.HasValue, cancellationToken);
+        var boss = dbContext.Boss
+            .AsEnumerable()
+            .SingleOrDefault(x => !x.KilledAt.HasValue && x.CreatedAt <= DateTimeOffset.UtcNow);
         
         if (boss is null) return;
 
@@ -46,17 +69,13 @@ internal sealed class KoruxaBossService(AppDbContext dbContext)
         return user;
     }
 
-    private async Task<KoruxaBoss> GetOrAddBossAsync(CancellationToken cancellationToken)
+    public Task<KoruxaBoss?> GetCurrentBossAsync(CancellationToken cancellationToken)
     {
-        var boss = await dbContext.Boss
-            .SingleOrDefaultAsync(x => !x.KilledAt.HasValue, cancellationToken);
-
-        if (boss is not null) return boss;
-
-        boss = KoruxaBoss.CreateNew();
+        var boss = dbContext.Boss
+            .AsEnumerable()
+            .SingleOrDefault(x => !x.KilledAt.HasValue && 
+                                  x.CreatedAt <= DateTimeOffset.UtcNow);
         
-        dbContext.Boss.Add(boss);
-        
-        return boss;
+        return Task.FromResult(boss);
     }
 }
