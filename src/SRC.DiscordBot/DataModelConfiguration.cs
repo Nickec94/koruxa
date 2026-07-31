@@ -17,7 +17,7 @@ internal sealed class DataModelConfiguration :
         builder.HasKey(x => x.Id);
         
         builder.Property(x => x.Id).ValueGeneratedOnAdd();
-        builder.Property(x => x.HasNotifiedSpawn).HasColumnName("has_notified_spawn").IsRequired();
+        
         builder.DefineOneToMany(x => x.Attacks, x => x.BossId);
     }
 
