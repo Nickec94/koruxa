@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using NetCord.Hosting.Gateway;
 using NetCord.Hosting.Services.ApplicationCommands;
+using NetCord.Hosting.Services.ComponentInteractions;
 using Nixon.Extensions.Hosting.Jobs;
 using Nixon.Extensions.Serilog.AspNetCore;
 
@@ -34,10 +35,12 @@ builder.Services.AddCronJob<BossAttackNotifier>("0 */10 * * * ?");
 builder.Services.TryAddScoped<KoruxaBossService>();
 
 builder.Services.AddApplicationCommands();
-    
+builder.Services.AddComponentInteractions();
+
 var host = builder.Build(); 
 
 host.AddApplicationCommandModule<SlashCommandModule>();
+host.AddComponentInteractionModule<BossTimerComponentModule>();
 
 using (var scope = host.Services.CreateScope())
 {
